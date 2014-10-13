@@ -1,5 +1,8 @@
 "use strict";
 
+// As a warning, since we just use JS math, this is very not exact.
+// Not very good to use for scientific computing. Maybe okay for games,
+// designed for demos.
 /*jshint -W079 */
 var Orbit = (function() {
   // Constants
@@ -42,7 +45,9 @@ var Orbit = (function() {
   function Elliptic2D(parameters) {
     this.a = parameters.a;
     this.e = parameters.e;
-    this.mu = parameters.mu || constants.mu_earth;
+    this.mu = parameters.mu || constants.mu_kerbin;
+    this.body_radius = parameters.r;
+    this.recompute();
   }
 
   Elliptic2D.prototype.recompute = function() {
@@ -57,6 +62,9 @@ var Orbit = (function() {
     this.n = Math.sqrt(this.mu / Math.pow(this.a, 3));
     this.period = Math.sqrt(4 * Math.pow(Math.PI, 2) * Math.pow(this.a, 3) / this.mu);
     this.specific_energy = -this.mu / (2 * this.a);
+
+    this.periapsis_altitude = this.r_p - this.body_radius;
+    this.apoapsis_altitude = this.r_a - this.body_radius;
   };
 
   Elliptic2D.prototype.rv_at_theta = function(theta) {
@@ -64,7 +72,10 @@ var Orbit = (function() {
     var v = Math.sqrt(this.mu * (2 / r - 1 / this.a));
     return {
       r: r,
-      v: v
+      v: v,
+      altitude: {
+        r: r - this.body_radius
+      }
     };
   };
 

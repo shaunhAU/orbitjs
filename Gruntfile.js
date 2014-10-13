@@ -39,17 +39,26 @@ module.exports = function(grunt) {
         configFile: "ci-test.conf.js"
       }
     },
+    uglify: {
+      prod: {
+        files: {
+          "build/orbit.min.js": ["src/math.js", "src/orbit.js"],
+        },
+      }
+    },
     watch: {
       jswatch: {
-        files: ALL_OUR_JS_SOURCES,
+        files: ALL_OUR_JS_SOURCES.concat("Gruntfile.js"),
         tasks: ["jshint", "karma:dev:run"]
       }
     }
   });
 
   grunt.loadNpmTasks("grunt-contrib-jshint");
-  grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-karma');
+  grunt.loadNpmTasks("grunt-contrib-uglify");
+  grunt.loadNpmTasks("grunt-contrib-watch");
+  grunt.loadNpmTasks("grunt-karma");
 
   grunt.registerTask("default", ["jshint", "karma:dev:start", "watch"]);
+  grunt.registerTask("prod", ["jshint", "uglify:prod", "karma:ci:start"]);
 };
