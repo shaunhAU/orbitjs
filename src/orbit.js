@@ -88,6 +88,27 @@ var Orbit = (function() {
     return (E - this.e * Math.sin(E)) / this.n;
   };
 
+  Elliptic2D.prototype.theta_given_time = function(t) {
+    var M = this.n * t;
+    var E_current = M;
+    var E_next;
+    var i = 0;
+    while (true) {
+      E_next = E_current + (M - E_current + this.e * Math.sin(E_current)) / (1 - this.e * Math.cos(E_current));
+      if (Math.abs(E_next - E_current) < 0.00001) {
+        break;
+      }
+      E_current = E_next;
+      i++;
+    }
+
+    var theta = 2 * Math.atan(Math.sqrt((1 + this.e) / (1 - this.e)) * Math.tan(E_next / 2));
+    while (theta < 0) {
+      theta += Math.PI * 2;
+    }
+    return theta % (Math.PI * 2);
+  };
+
   return {
     constants: constants,
     utils: utils,

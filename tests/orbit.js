@@ -73,5 +73,13 @@
       time = kso.time_since_periapsis(Math.PI);
       expect(time).toBeCloseTo(3 * 3600, 0.1);
     });
+
+    it("should compute theta given time since periapsis", function() {
+      var theta = kso.theta_given_time(0);
+      expect(theta).toBe(0);
+
+      theta = kso.theta_given_time(3 * 3600);
+      expect(theta).toBeCloseTo(Math.PI, 0.00001);
+    });
   });
 })();
