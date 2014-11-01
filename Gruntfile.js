@@ -16,6 +16,7 @@ module.exports = function(grunt) {
         globals: {
           module: false,
           console: false,
+          $: false,
 
           math: false,
           Orbit: false,
@@ -43,6 +44,7 @@ module.exports = function(grunt) {
       prod: {
         files: {
           "build/orbit.min.js": ["src/math.js", "src/orbit.js"],
+          "build/canvas.min.js": ["src/canvas.js"]
         },
       }
     },

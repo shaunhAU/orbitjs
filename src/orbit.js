@@ -73,9 +73,7 @@ var Orbit = (function() {
     return {
       r: r,
       v: v,
-      altitude: {
-        r: r - this.body_radius
-      }
+      altitude: r - this.body_radius
     };
   };
 
@@ -107,6 +105,23 @@ var Orbit = (function() {
       theta += Math.PI * 2;
     }
     return theta % (Math.PI * 2);
+  };
+
+  Elliptic2D.prototype.trace = function(theta_increments) {
+    theta_increments = theta_increments || 0.0087266; // increment by 0.5 degrees
+    var orbit = [];
+    var rv, t;
+    for (var current_theta = 0; current_theta < Math.PI * 2; current_theta += theta_increments) {
+      rv = this.rv_at_theta(current_theta);
+      t = this.time_since_periapsis(current_theta);
+      orbit.push({
+        r: rv.r,
+        altitude: rv.altitude,
+        v: rv.v,
+        t: t
+      });
+    }
+    return orbit;
   };
 
   return {

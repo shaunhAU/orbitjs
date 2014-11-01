@@ -52,17 +52,17 @@
     it("should compute velocity and r", function() {
       var rv = kso.rv_at_theta(0);
       expect(rv.r).toEqual(kso_d);
-      expect(rv.altitude.r).toEqual(kso_d - kerbin_radius);
+      expect(rv.altitude).toEqual(kso_d - kerbin_radius);
       expect(rv.v).toBeCloseTo(1.00902, 0.00001);
 
       rv = onetwohundred_orbit.rv_at_theta(0);
       expect(rv.r).toEqual(700);
-      expect(rv.altitude.r).toEqual(100);
+      expect(rv.altitude).toEqual(100);
       expect(rv.v).toBeCloseTo(2.319, 0.001);
 
       rv = onetwohundred_orbit.rv_at_theta(Math.PI);
       expect(rv.r).toEqual(800);
-      expect(rv.altitude.r).toEqual(200);
+      expect(rv.altitude).toEqual(200);
       expect(rv.v).toBeCloseTo(2.030, 0.001);
     });
 
@@ -80,6 +80,9 @@
 
       theta = kso.theta_given_time(3 * 3600);
       expect(theta).toBeCloseTo(Math.PI, 0.00001);
+
+      theta = kso.theta_given_time(1.5 * 3600);
+      expect(theta).toBeCloseTo(Math.PI / 2, 0.00001);
     });
   });
 })();
