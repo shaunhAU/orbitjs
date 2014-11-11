@@ -1,55 +1,17 @@
 "use strict";
 
-// As a warning, since we just use JS math, this is very not exact.
-// Not very good to use for scientific computing. Maybe okay for games,
-// designed for demos.
-/*jshint -W079 */
-var Orbit = (function() {
-  // Constants
-  var constants = {
-    mu_earth: 398600,  // km^3 s^-2
-    mu_kerbin: 3531.6, // km^3 s^-2
-  };
-
-  // Utility functions
-  var utils = {};
-
-  // norm a if a is a vector, otherwise return a
-  utils.norm = function(a) {
-    if (a.length !== undefined) {
-      return math.norm(a);
-    }
-    return a;
-  };
-
-  // Fundamental integrals
-  utils.angular_momentum = function(r, v) {
-    return math.cross(r, v);
-  };
-
-  utils.orbital_specific_energy = function(v, r, mu) {
-    v = utils.norm(v);
-    r = utils.norm(r);
-    mu = mu || constants.mu_earth;
-
-    return v * v / 2 - mu / r;
-  };
-
-  utils.eccentricity_vector = function(v, h, r, mu) {
-    mu = mu || constants.mu_earth;
-    var one = math.e.div(math.cross(v, h), mu);
-    var two = math.e.div(r, math.norm(r));
-    return math.sub(one, two);
-  };
-
+Orbits.Elliptic2D = (function(Orbits) {
   function Elliptic2D(parameters) {
     this.a = parameters.a;
     this.e = parameters.e;
-    this.mu = parameters.mu || constants.mu_kerbin;
+    this.mu = parameters.mu || Orbits.constants.mu_kerbin;
     this.body_radius = parameters.r;
     this.recompute();
   }
 
+  /**
+   * Recomputes the basic elements of this orbit.
+   */
   Elliptic2D.prototype.recompute = function() {
     // Basic elliptical parameters
     this.b = this.a * Math.sqrt(1 - this.e * this.e);
@@ -67,6 +29,11 @@ var Orbit = (function() {
     this.apoapsis_altitude = this.r_a - this.body_radius;
   };
 
+  /**
+   * Computes the radius and velocity with its magnitude as well as its
+   * components in the perifocal reference type.
+   * @param  number theta true anomaly measured in radians
+   */
   Elliptic2D.prototype.rv_at_theta = function(theta) {
     var r = this.p / (1 + this.e * Math.cos(theta));
     var v = Math.sqrt(this.mu * (2 / r - 1 / this.a));
@@ -92,6 +59,11 @@ var Orbit = (function() {
     return (E - this.e * Math.sin(E)) / this.n;
   };
 
+  /**
+   * Given a time since periapsis, calculate the true anomaly
+   * @param  number t time in seconds
+   * @return number true anomaly in radians
+   */
   Elliptic2D.prototype.theta_given_time = function(t) {
     var M = this.n * t;
     var E_current = M;
@@ -129,11 +101,48 @@ var Orbit = (function() {
     return orbit;
   };
 
-  Elliptic2D.prototype.resize_canvas = function(canvas) {
-    this.usable_canvas_width = canvas.el.width;
+  Elliptic2D.prototype.canvas_scale = function(v) {
+    return v * this.usable_canvas_width / (2 * this.a);
   };
 
-  Elliptic2D.prototype.init_canvas = function(canvas) {
+  /**
+   * Calculate the coorindate for <canvas> given a coordinate in the perifocal
+   * reference frame. This needs a canvas to be initialized and uses a 5%
+   * padding on either side.
+   * @param  number x x coordinate in the perifocal reference frame.
+   * @param  number y y coordinate in the perifocal reference frame
+   * @return hash {x: x in canvas, y: y in canvas}
+   */
+  Elliptic2D.prototype.to_canvas_coordinates = function(x, y) {
+    var margin = (this.canvas_width - this.usable_canvas_width) / 2;
+    x = this.canvas_scale(this.r_a + x);
+    y = this.canvas_scale(y);
+    return {
+      x: margin + x,
+      y: this.canvas_height / 2 - y
+    };
+  };
+
+  var CENTER_SIZE = 10;
+  Elliptic2D.prototype.draw_background = function(canvas) {
+    var ctx = canvas.ctx;
+
+    // Draws the center
+    var center = this.to_canvas_coordinates(0, 0);
+    var center_offset = CENTER_SIZE / 2;
+    ctx.moveTo(center.x - center_offset, center.y);
+    ctx.lineTo(center.x + center_offset, center.y);
+
+    ctx.moveTo(center.x, center.y - center_offset);
+    ctx.lineTo(center.x, center.y + center_offset);
+
+    ctx.strokeStyle = canvas.styles.center.color;
+    ctx.stroke();
+
+    canvas.draw_ellipse(this.canvas_width / 2, this.canvas_height / 2, this.canvas_scale(this.a), this.canvas_scale(this.b), canvas.styles.orbit);
+  };
+
+  Elliptic2D.prototype.resize_canvas = function(canvas) {
     // Regardless of what happens, we need to first compute the geometry we
     // can use.
     //
@@ -144,6 +153,13 @@ var Orbit = (function() {
     // 5% of the edge each side, leaving us with some room to draw things if
     // necessary. This is a minimum of 20pxs each side according to our minimum
     // specification.
+    this.canvas_width = canvas.el.width;
+    this.canvas_height = canvas.el.height;
+    this.usable_canvas_width = canvas.el.width * 0.9;
+    this.draw_background(canvas);
+  };
+
+  Elliptic2D.prototype.init_canvas = function(canvas) {
     this.resize_canvas(canvas);
   };
 
@@ -151,9 +167,5 @@ var Orbit = (function() {
 
   };
 
-  return {
-    constants: constants,
-    utils: utils,
-    Elliptic2D: Elliptic2D,
-  };
-})();
+  return Elliptic2D;
+})(Orbits);

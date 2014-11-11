@@ -1,0 +1,50 @@
+<html>
+<head>
+<title>Kerbin Synchronous Orbit</title>
+<style>
+html, body {
+  text-align: center;
+}
+canvas {
+  border: 1px solid #CCC;
+  margin: 0 auto;
+  vertical-align: middle;
+}
+
+div#info {
+  width: 600px;
+  min-height: 2em;
+  border: 1px solid #CCC;
+  margin: 1em auto;
+}
+
+</style>
+</head>
+<body>
+<h1>Kerbin Synchronous Orbit</h1>
+<canvas id="display" width="600" height="600">Your browser is not supported</canvas>
+<div id="info"></div>
+
+<select id="orbit">
+  <option value="kso" selected="selected">Kerbin Synchronous Orbit</option>
+  <option value="onetwohundred">200km Apoapsis, 100km Periapsis above Kerbin</option>
+</select>
+
+<script src="../src/math.js"></script>
+<script src="../src/orbits.js"></script>
+<script src="../src/orbits/elliptic2d.js"></script>
+<script src="../src/canvas.js"></script>
+<script>
+  window.onload = function() {
+    var canvas = new Canvas("display", "info");
+    var kso = new Orbits.Elliptic2D({
+      a: 3468.75,
+      e: 0,
+      mu: Orbits.constants.mu_kerbin,
+      r: 600,
+    });
+    canvas.set_orbit(kso);
+  };
+</script>
+</body>
+</html>

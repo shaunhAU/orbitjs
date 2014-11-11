@@ -19,7 +19,7 @@ module.exports = function(grunt) {
           $: false,
 
           math: false,
-          Orbit: false,
+          Orbits: false,
 
           // jasmine stuff
           describe: false,
@@ -43,7 +43,7 @@ module.exports = function(grunt) {
     uglify: {
       prod: {
         files: {
-          "build/orbit.min.js": ["src/math.js", "src/orbit.js"],
+          "build/orbits.min.js": ["src/math.js", "src/orbits.js", "src/orbits/**/*.js"],
           "build/canvas.min.js": ["src/canvas.js"]
         },
       }

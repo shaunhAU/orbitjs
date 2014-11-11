@@ -9,17 +9,17 @@
     var onetwohundred_orbit;
 
     beforeEach(function() {
-      kso = new Orbit.Elliptic2D({
+      kso = new Orbits.Elliptic2D({
         a: kso_d,
         e: 0,
-        mu: Orbit.constants.mu_kerbin,
+        mu: Orbits.constants.mu_kerbin,
         r: kerbin_radius,
       });
 
-      onetwohundred_orbit = new Orbit.Elliptic2D({
+      onetwohundred_orbit = new Orbits.Elliptic2D({
         a: 750,
         e: (1/15),
-        mu: Orbit.constants.mu_kerbin,
+        mu: Orbits.constants.mu_kerbin,
         r: kerbin_radius,
       });
     });
@@ -98,6 +98,14 @@
 
       theta = kso.theta_given_time(1.5 * 3600);
       expect(theta).toBeCloseTo(Math.PI / 2, 0.00001);
+    });
+
+    it("should initialize canvas", function() {
+
+    });
+
+    it("should calculate canvas coordinates given perifocal coordinates", function() {
+
     });
   });
 })();
