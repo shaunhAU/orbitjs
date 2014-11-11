@@ -55,15 +55,30 @@
       expect(rv.altitude).toEqual(kso_d - kerbin_radius);
       expect(rv.v).toBeCloseTo(1.00902, 0.00001);
 
+      expect(rv.perifocal.rx).toEqual(rv.r);
+      expect(rv.perifocal.ry).toEqual(0);
+      expect(rv.perifocal.vx).toBeCloseTo(0, 0.00001);
+      expect(rv.perifocal.vy).toBeCloseTo(1.00902, 0.00001);
+
       rv = onetwohundred_orbit.rv_at_theta(0);
       expect(rv.r).toEqual(700);
       expect(rv.altitude).toEqual(100);
       expect(rv.v).toBeCloseTo(2.319, 0.001);
 
+      expect(rv.perifocal.rx).toEqual(700);
+      expect(rv.perifocal.ry).toEqual(0);
+      expect(rv.perifocal.vx).toBeCloseTo(0, 0.00001);
+      expect(rv.perifocal.vy).toBeCloseTo(2.319, 0.001);
+
       rv = onetwohundred_orbit.rv_at_theta(Math.PI);
       expect(rv.r).toEqual(800);
       expect(rv.altitude).toEqual(200);
       expect(rv.v).toBeCloseTo(2.030, 0.001);
+
+      expect(rv.perifocal.rx).toEqual(-800);
+      expect(rv.perifocal.ry).toBeCloseTo(0, 0.0001);
+      expect(rv.perifocal.vx).toBeCloseTo(0, 0.00001);
+      expect(rv.perifocal.vy).toBeCloseTo(-2.030, 0.001);
     });
 
     it("should compute time since periapsis", function() {

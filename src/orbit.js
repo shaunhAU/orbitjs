@@ -73,7 +73,13 @@ var Orbit = (function() {
     return {
       r: r,
       v: v,
-      altitude: r - this.body_radius
+      altitude: r - this.body_radius,
+      perifocal: {
+        rx: r * Math.cos(theta),
+        ry: r * Math.sin(theta),
+        vx: -Math.sqrt(this.mu / this.p) * Math.sin(theta),
+        vy: Math.sqrt(this.mu / this.p) * (this.e + Math.cos(theta))
+      }
     };
   };
 
@@ -115,13 +121,34 @@ var Orbit = (function() {
       rv = this.rv_at_theta(current_theta);
       t = this.time_since_periapsis(current_theta);
       orbit.push({
-        r: rv.r,
+        rv: rv,
         altitude: rv.altitude,
-        v: rv.v,
         t: t
       });
     }
     return orbit;
+  };
+
+  Elliptic2D.prototype.resize_canvas = function(canvas) {
+    this.usable_canvas_width = canvas.el.width;
+  };
+
+  Elliptic2D.prototype.init_canvas = function(canvas) {
+    // Regardless of what happens, we need to first compute the geometry we
+    // can use.
+    //
+    // For now, we will only plot the periapsis on the right side and the orbit
+    // horizontally (semimajor axis horizontally)
+    //
+    // We also assume that the canvaa is at least 400px. We want to leave about
+    // 5% of the edge each side, leaving us with some room to draw things if
+    // necessary. This is a minimum of 20pxs each side according to our minimum
+    // specification.
+    this.resize_canvas(canvas);
+  };
+
+  Elliptic2D.prototype.draw_on = function(canvas, params) {
+
   };
 
   return {
