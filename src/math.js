@@ -119,6 +119,11 @@ var math = (function() {
     return e_op(a, b, "div");
   }
 
+  function round(v, digits) {
+    var m = Math.pow(10, digits)
+    return Math.round(v * m) / m;
+  }
+
   return {
     e: {
       add: e_add,
@@ -129,6 +134,7 @@ var math = (function() {
     cross: cross,
     dot: dot,
     norm: norm,
+    round: round,
     MathError: MathError,
     DimensionMismatchError: DimensionMismatchError
   };

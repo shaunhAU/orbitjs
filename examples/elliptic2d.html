@@ -1,14 +1,25 @@
 <html>
 <head>
 <title>Kerbin Synchronous Orbit</title>
+<link rel="stylesheet" type="text/css" href="../src/canvas.css">
 <style>
 html, body {
   text-align: center;
 }
-canvas {
-  border: 1px solid #CCC;
+
+div#viewport {
+  width: 600px;
+  height: 602px;
   margin: 0 auto;
-  vertical-align: middle;
+}
+
+div#viewport canvas.background {
+  left: -1px;
+}
+
+div#viewport canvas.foreground {
+  left: -1px;
+  border: 1px solid #CCC;
 }
 
 div#info {
@@ -18,12 +29,56 @@ div#info {
   margin: 1em auto;
 }
 
+div#info table {
+  margin: 0 auto;
+}
 </style>
 </head>
 <body>
-<h1>Kerbin Synchronous Orbit</h1>
-<canvas id="display" width="600" height="600">Your browser is not supported</canvas>
-<div id="info"></div>
+<h1>Elliptic2D test page</h1>
+<div id="viewport">
+  <canvas class="background" width="600" height="600"></canvas>
+  <canvas class="foreground" width="600" height="600">Your browser is not supported</canvas>
+</div>
+<div id="info">
+  <table>
+    <tr>
+      <th>Apoapsis</th>
+      <td class="apoapsis"></td>
+      <td>km</td>
+    </tr>
+    <tr>
+      <th>Periapsis</th>
+      <td class="periapsis"></td>
+      <td>km</td>
+    </tr>
+    <tr>
+      <th>Altitude</th>
+      <td class="altitude"></td>
+      <td>km</td>
+    </tr>
+    <tr>
+      <th>Velocity</th>
+      <td class="velocity"></td>
+      <td>km/s</td>
+    </tr>
+    <tr>
+      <th>True anomaly</th>
+      <td class="theta"></td>
+      <td>deg</td>
+    </tr>
+    <tr>
+      <th>Time</th>
+      <td class="time"></td>
+      <td>s</td>
+    </tr>
+    <tr>
+      <th>Frame render time</th>
+      <td class="frt"></td>
+      <td>ms</td>
+    </tr>
+  </table>
+</div>
 
 <select id="orbit-selector">
   <option value="kso" selected="selected">Kerbin Synchronous Orbit</option>
@@ -56,9 +111,8 @@ div#info {
       "kso": kso,
       "o1": o1
     }
-    var canvas = new Canvas("display", "info");
+    var canvas = new Canvas("viewport", "info");
     canvas.set_orbit(kso);
-    console.log(o1);
 
     var selector = document.getElementById("orbit-selector");
     selector.onchange = function(event) {

@@ -1,0 +1,18 @@
+div#viewport {
+  position: relative;
+}
+
+div#viewport canvas {
+  position: absolute;
+  background-color: transparent;
+}
+
+div#viewport canvas.background {
+  left: 0;
+  z-index: -1;
+}
+
+div#viewport canvas.foreground {
+  left: 0;
+  z-index: 100;
+}
