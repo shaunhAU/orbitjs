@@ -25,9 +25,9 @@ div#info {
 <canvas id="display" width="600" height="600">Your browser is not supported</canvas>
 <div id="info"></div>
 
-<select id="orbit">
+<select id="orbit-selector">
   <option value="kso" selected="selected">Kerbin Synchronous Orbit</option>
-  <option value="onetwohundred">200km Apoapsis, 100km Periapsis above Kerbin</option>
+  <option value="o1">840km Apoapsis, 7560km Periapsis</option>
 </select>
 
 <script src="../src/math.js"></script>
@@ -35,15 +35,36 @@ div#info {
 <script src="../src/orbits/elliptic2d.js"></script>
 <script src="../src/canvas.js"></script>
 <script>
+
   window.onload = function() {
-    var canvas = new Canvas("display", "info");
+    console.log("loaded");
     var kso = new Orbits.Elliptic2D({
       a: 3468.75,
       e: 0,
       mu: Orbits.constants.mu_kerbin,
       r: 600,
     });
+
+    var o1 = new Orbits.Elliptic2D({
+      a: 4200,
+      e: (8/10),
+      mu: Orbits.constants.mu_kerbin,
+      r: 600,
+    });
+
+    var orbits = {
+      "kso": kso,
+      "o1": o1
+    }
+    var canvas = new Canvas("display", "info");
     canvas.set_orbit(kso);
+    console.log(o1);
+
+    var selector = document.getElementById("orbit-selector");
+    selector.onchange = function(event) {
+      console.log("changing to " + event.target.value);
+      canvas.set_orbit(orbits[event.target.value]);
+    };
   };
 </script>
 </body>

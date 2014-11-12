@@ -19,6 +19,16 @@ var Canvas = (function() {
 
   Canvas.prototype.set_orbit = function(orbit) {
     this.orbit = orbit;
+    // Store the current transformation matrix
+    this.ctx.save();
+
+    // Use the identity matrix while clearing the canvas
+    this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+    this.ctx.clearRect(0, 0, this.el.width, this.el.height);
+
+    // Restore the transform
+    this.ctx.restore();
+
     this.orbit.init_canvas(this);
     this.redraw();
   };
@@ -49,7 +59,7 @@ var Canvas = (function() {
         xe = xs + 2 * a,
         ye = ys + 2 * b,
         xm = xs + a,
-        ym = ys + a,
+        ym = ys + b,
         ctx = this.ctx;
 
     ctx.beginPath();
@@ -64,6 +74,7 @@ var Canvas = (function() {
   Canvas.prototype.draw_circle = function(x, y, r, style) {
     style = style || {};
     var ctx = this.ctx;
+    ctx.beginPath();
     ctx.arc(x, y, r, 0, 2 * Math.PI, false);
     this.ink(style);
   };

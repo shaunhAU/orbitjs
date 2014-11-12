@@ -130,6 +130,7 @@ Orbits.Elliptic2D = (function(Orbits) {
     // Draws the center
     var center = this.to_canvas_coordinates(0, 0);
     var center_offset = CENTER_SIZE / 2;
+    ctx.beginPath();
     ctx.moveTo(center.x - center_offset, center.y);
     ctx.lineTo(center.x + center_offset, center.y);
 
