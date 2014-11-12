@@ -149,35 +149,21 @@ Orbits.Elliptic2D = (function(Orbits) {
   };
 
   Elliptic2D.prototype.update_info = function(canvas, time, rv, theta) {
-    var el = canvas.info_el.querySelectorAll(".apoapsis");
-    if (el.length > 0) {
-      el[0].innerHTML = math.round(this.r_a, 2);
+    var display = function(selector, value) {
+      var el = canvas.info_el.querySelectorAll(selector);
+      if (el.length > 0) {
+        el[0].innerHTML = math.round(value, 2);
+      }
     }
 
-    el = canvas.info_el.querySelectorAll(".periapsis");
-    if (el.length > 0) {
-      el[0].innerHTML = math.round(this.r_p, 2);
-    }
-
-    el = canvas.info_el.querySelectorAll(".time");
-    if (el.length > 0) {
-      el[0].innerHTML = math.round(time, 2);
-    }
-
-    el = canvas.info_el.querySelectorAll(".altitude");
-    if (el.length > 0) {
-      el[0].innerHTML = math.round(rv.altitude, 2);
-    }
-
-    el = canvas.info_el.querySelectorAll(".velocity");
-    if (el.length > 0) {
-      el[0].innerHTML = math.round(rv.v, 2);
-    }
-
-    el = canvas.info_el.querySelectorAll(".theta");
-    if (el.length > 0) {
-      el[0].innerHTML = math.round(theta * 180 / Math.PI, 2);
-    }
+    display(".apoapsis", this.r_a);
+    display(".periapsis", this.r_p);
+    display(".semimajor", this.a);
+    display(".eccentricity", this.e);
+    display(".time", time);
+    display(".altitude", rv.altitude);
+    display(".velocity", rv.v);
+    display(".theta", theta * 180 / Math.PI);
   };
 
   Elliptic2D.prototype.draw_satellite = function(canvas, location) {
