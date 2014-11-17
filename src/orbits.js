@@ -9,6 +9,7 @@ var Orbits = (function() {
   var constants = {
     mu_earth: 398600,  // km^3 s^-2
     mu_kerbin: 3531.6, // km^3 s^-2
+    G: 6.67384e-20, // km^3 kg^-1 s^-2
   };
 
   // Utility functions
