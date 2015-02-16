@@ -43,8 +43,9 @@ module.exports = function(grunt) {
     uglify: {
       prod: {
         files: {
-          "build/orbits.min.js": ["src/math.js", "src/orbits.js", "src/orbits/**/*.js"],
-          "build/canvas.min.js": ["src/canvas.js"]
+          "build/orbit.min.js": ["src/math.js", "src/orbits.js", "src/orbits/**/*.js"],
+          "build/canvas.min.js": ["src/canvas.js"],
+          "build/orbit-full.min.js": ["src/math.js", "src/orbits.js", "src/orbits/**/*.js", "src/canvas.js"]
         },
       }
     },
@@ -61,6 +62,13 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks("grunt-contrib-watch");
   grunt.loadNpmTasks("grunt-karma");
 
+  grunt.registerTask("getsha", function() {
+    var done = this.async();
+    grunt.util.spawn({cmd: "git", args: ["rev-parse", "HEAD"]}, function(err, stdout, stderr) {
+      grunt.config("uglify.options.banner", '/*! orbitjs (https://github.com/shuhaowu/orbitjs) v: ' + stdout.stdout + '*/\n');
+      done();
+    });
+  });
   grunt.registerTask("default", ["jshint", "karma:dev:start", "watch"]);
-  grunt.registerTask("prod", ["jshint", "uglify:prod", "karma:ci:start"]);
+  grunt.registerTask("prod", ["getsha", "jshint", "uglify:prod", "karma:ci:start"]);
 };
