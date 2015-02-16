@@ -46,6 +46,12 @@ var math = (function() {
     return Math.sqrt(s);
   }
 
+  function rotate(v, theta) {
+    var xp = v[0] * Math.cos(theta) - v[1] * Math.sin(theta);
+    var yp = v[0] * Math.sin(theta) + v[1] * Math.cos(theta);
+    return [xp, yp];
+  }
+
   function e_op(a, b, op) {
     function o(v1, v2) {
       switch (op) {
@@ -120,7 +126,7 @@ var math = (function() {
   }
 
   function round(v, digits) {
-    var m = Math.pow(10, digits)
+    var m = Math.pow(10, digits);
     return Math.round(v * m) / m;
   }
 
@@ -135,6 +141,7 @@ var math = (function() {
     dot: dot,
     norm: norm,
     round: round,
+    rotate: rotate,
     MathError: MathError,
     DimensionMismatchError: DimensionMismatchError
   };

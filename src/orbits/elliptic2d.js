@@ -6,6 +6,9 @@ Orbits.Elliptic2D = (function(Orbits) {
     this.e = parameters.e;
     this.mu = parameters.mu || Orbits.constants.mu_kerbin;
     this.body_radius = parameters.r;
+
+    this.show_r_vector = parameters.show_r_vector || false;
+    this.show_v_vector = parameters.show_v_vector || false;
     this.recompute();
   }
 
@@ -27,6 +30,11 @@ Orbits.Elliptic2D = (function(Orbits) {
 
     this.periapsis_altitude = this.r_p - this.body_radius;
     this.apoapsis_altitude = this.r_a - this.body_radius;
+
+    // Other things for drawing things
+
+    // for drawing a velocity vector.
+    this.v_p = this.rv_at_theta(0).v;
   };
 
   /**
@@ -101,8 +109,15 @@ Orbits.Elliptic2D = (function(Orbits) {
     return orbit;
   };
 
-  Elliptic2D.prototype.canvas_scale = function(v) {
+  Elliptic2D.prototype.canvas_length_scale = function(v) {
     return v * this.usable_canvas_width / (2 * this.a);
+  };
+
+
+  Elliptic2D.prototype.canvas_velocity_scale = function(v) {
+    // maximum velocity will be 10% of the canvas width
+    var PERCENTAGE_OF_USEFUL_WIDTH = 0.5;
+    return v * PERCENTAGE_OF_USEFUL_WIDTH * this.usable_canvas_width / (2 * this.v_p);
   };
 
   /**
@@ -113,13 +128,27 @@ Orbits.Elliptic2D = (function(Orbits) {
    * @param  number y y coordinate in the perifocal reference frame
    * @return hash {x: x in canvas, y: y in canvas}
    */
-  Elliptic2D.prototype.to_canvas_coordinates = function(x, y) {
+  Elliptic2D.prototype.scale_length_to_canvas = function(x, y) {
     var margin = (this.canvas_width - this.usable_canvas_width) / 2;
-    x = this.canvas_scale(this.r_a + x);
-    y = this.canvas_scale(y);
+    x = this.canvas_length_scale(this.r_a + x);
+    y = this.canvas_length_scale(y);
     return {
       x: margin + x,
       y: this.canvas_height / 2 - y
+    };
+  };
+
+  /**
+   * Calculate the size of a velocity vector for <canvas>
+   * @param  number x x velocity
+   * @param  number y y velocity
+   * @return hash   {x: x velocity scaled for <canvas>, y: y for the same}
+   */
+  Elliptic2D.prototype.scale_velocity_to_canvas = function(x, y) {
+    var margin = (this.canvas_width - this.usable_canvas_width) / 2;
+    return {
+      x: this.canvas_velocity_scale(x),
+      y: -this.canvas_velocity_scale(y)
     };
   };
 
@@ -127,11 +156,11 @@ Orbits.Elliptic2D = (function(Orbits) {
   Elliptic2D.prototype.draw_background = function(canvas) {
     var ctx = canvas.background_ctx;
 
-    var center = this.to_canvas_coordinates(0, 0);
+    var center = this.scale_length_to_canvas(0, 0);
     var center_offset = CENTER_SIZE / 2;
 
     // Draw center body
-    canvas.draw_circle(ctx, center.x, center.y, this.canvas_scale(this.body_radius), canvas.styles.m1);
+    canvas.draw_circle(ctx, center.x, center.y, this.canvas_length_scale(this.body_radius), canvas.styles.m1);
 
     // Draw middle cross
     ctx.beginPath();
@@ -145,7 +174,7 @@ Orbits.Elliptic2D = (function(Orbits) {
     ctx.stroke();
 
     // Draw orbit
-    canvas.draw_ellipse(ctx, this.canvas_width / 2, this.canvas_height / 2, this.canvas_scale(this.a), this.canvas_scale(this.b), canvas.styles.orbit);
+    canvas.draw_ellipse(ctx, this.canvas_width / 2, this.canvas_height / 2, this.canvas_length_scale(this.a), this.canvas_length_scale(this.b), canvas.styles.orbit);
   };
 
   Elliptic2D.prototype.update_info = function(canvas, time, rv, theta) {
@@ -154,7 +183,7 @@ Orbits.Elliptic2D = (function(Orbits) {
       if (el.length > 0) {
         el[0].innerHTML = math.round(value, 2);
       }
-    }
+    };
 
     display(".apoapsis", this.r_a);
     display(".periapsis", this.r_p);
@@ -166,17 +195,51 @@ Orbits.Elliptic2D = (function(Orbits) {
     display(".theta", theta * 180 / Math.PI);
   };
 
-  Elliptic2D.prototype.draw_satellite = function(canvas, location) {
+  Elliptic2D.prototype.draw_satellite = function(canvas, location, velocity) {
     var satellite_screen_size = 8;
+    var r_arrow_style = {
+      size: 20,
+      angle: 20 * Math.PI / 180,
+      color: "#F00"
+    };
+    var v_arrow_style = {
+      size: 20,
+      angle: 20 * Math.PI / 180,
+      color: "#F0F"
+    };
+    var center = this.scale_length_to_canvas(0, 0);
 
-    location = this.to_canvas_coordinates(location.x, location.y);
+    location = this.scale_length_to_canvas(location.x, location.y);
     canvas.draw_circle(
       canvas.foreground_ctx,
       location.x,
       location.y,
       satellite_screen_size,
       canvas.styles.m2
-    )
+    );
+
+    if (this.show_r_vector) {
+      canvas.draw_arrow(
+        canvas.foreground_ctx,
+        center.x,
+        center.y,
+        location.x,
+        location.y,
+        r_arrow_style
+      );
+    }
+
+    if (this.show_v_vector) {
+      velocity = this.scale_velocity_to_canvas(velocity.x, velocity.y);
+      canvas.draw_arrow(
+        canvas.foreground_ctx,
+        location.x,
+        location.y,
+        location.x + velocity.x,
+        location.y + velocity.y,
+        v_arrow_style
+      );
+    }
   };
 
   Elliptic2D.prototype.resize_canvas = function(canvas) {
@@ -209,7 +272,12 @@ Orbits.Elliptic2D = (function(Orbits) {
     var theta = this.theta_given_time(time); // sloooooowwwww
     var rv = this.rv_at_theta(theta);
 
-    this.draw_satellite(canvas, {x: rv.perifocal.rx, y: rv.perifocal.ry});
+    this.draw_satellite(
+      canvas,
+      {x: rv.perifocal.rx, y: rv.perifocal.ry},
+      {x: rv.perifocal.vx, y: rv.perifocal.vy}
+    );
+
     this.update_info(canvas, time, rv, theta);
   };
 

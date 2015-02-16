@@ -31,7 +31,7 @@ var Canvas = (function() {
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, this.background_el.width, this.background_el.height);
     ctx.restore();
-  }
+  };
 
   Canvas.prototype.clear_background = function() {
     this._clear(this.background_ctx);
@@ -107,6 +107,25 @@ var Canvas = (function() {
     style = style || {};
     ctx.beginPath();
     ctx.arc(x, y, r, 0, 2 * Math.PI, false);
+    this.ink(ctx, style);
+  };
+
+  Canvas.prototype.draw_arrow = function(ctx, tailx, taily, headx, heady, style) {
+    ctx.beginPath();
+    ctx.moveTo(tailx, taily);
+    ctx.lineTo(headx, heady);
+
+    var theta = Math.atan2((heady - taily), (headx - tailx));
+    var length = Math.sqrt(Math.pow(heady - taily, 2) + Math.pow(headx - tailx, 2));
+    var rotated_x = length - style.size * Math.cos(style.angle);
+    var rotated_y = style.size * Math.sin(style.angle);
+
+    var ccw_side = math.rotate([rotated_x, rotated_y], theta);
+    var cw_side = math.rotate([rotated_x, -rotated_y], theta);
+
+    ctx.lineTo(ccw_side[0] + tailx, ccw_side[1] + taily);
+    ctx.lineTo(cw_side[0] + tailx, cw_side[1] + taily);
+    ctx.lineTo(headx, heady);
     this.ink(ctx, style);
   };
 
