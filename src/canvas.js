@@ -7,10 +7,15 @@ var Canvas = (function() {
     this.foreground_el = this.viewport.querySelectorAll(".foreground")[0];
     this.background_ctx = this.background_el.getContext("2d");
     this.foreground_ctx = this.foreground_el.getContext("2d");
-    this.info_el = document.getElementById(info_div_id);
-    this.frt_el = this.info_el.querySelectorAll(".frt"); // frame render time
-    if (this.frt_el.length >= 0) {
-      this.frt_el = this.frt_el[0];
+    if (info_div_id) {
+      this.info_el = document.getElementById(info_div_id);
+      this.frt_el = this.info_el.querySelectorAll(".frt"); // frame render time
+      if (this.frt_el.length >= 0) {
+        this.frt_el = this.frt_el[0];
+      }
+    } else {
+      this.info_el = null;
+      this.frt_el = null;
     }
 
     this.styles = styles || {};

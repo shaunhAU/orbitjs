@@ -178,6 +178,10 @@ Orbits.Elliptic2D = (function(Orbits) {
   };
 
   Elliptic2D.prototype.update_info = function(canvas, time, rv, theta) {
+    if (!canvas.info_el) {
+      return;
+    }
+
     var display = function(selector, value) {
       var el = canvas.info_el.querySelectorAll(selector);
       if (el.length > 0) {
